@@ -3,7 +3,8 @@
 /**
  * Description of MySQL
  */
-//require_once 'class/IDatabase.interface.php';
+require_once 'IDatabase.interface.php';
+require_once 'BaseDatabase.class.php';
 
 class MySQL extends BaseDatabase implements IDatabase {
   /* @var $conn myqli */
@@ -46,7 +47,8 @@ class MySQL extends BaseDatabase implements IDatabase {
 
   public function query($statement) {
     //print $statement;
-    return $this->conn->query($this->cleanInput($statement));
+    // need to fix clean func
+    return $this->conn->query($statement);
   }
 
   public function getLastId($table, $tableID = null) {
@@ -85,14 +87,14 @@ class MySQL extends BaseDatabase implements IDatabase {
 
         foreach ($data as $col_name => $value) {
 
-          $cols .= $col_name . ',';
+          $cols .= '`'.$col_name . '`,';
 
           if (is_numeric($value)) {
 
             $values .= $value . ',';
           } else {
 
-            $values .= '\'' . $value . '\',';
+            $values .= "'" . $value . "',";
           }
         }
 
@@ -100,7 +102,7 @@ class MySQL extends BaseDatabase implements IDatabase {
 
         $cols = rtrim($cols, ', ');
 
-        $query = 'INSERT INTO ' . $table . ' (' . $cols . ') VALUES(' . $values . ');';
+        $query = "INSERT INTO " . $table . " (" . $cols . ") VALUES (" . $values . ")";
 
         if ($this->query($query)) {
           return true;
